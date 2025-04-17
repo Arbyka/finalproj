@@ -24,6 +24,11 @@ func SetupRouter() *gin.Engine {
         product.DELETE("/:id", middleware.JWTAuthMiddleware(), controller.DeleteProduct)
     }
 
+    r.POST("/orders", controller.CreateOrder)
+    r.GET("/orders", controller.GetAllOrders)
+    r.GET("/orders/:id", controller.GetOrderByID)
+    r.PUT("/orders/:id/status", controller.UpdateOrderStatus)
+
     r.GET("/report", middleware.JWTAuthMiddleware(), controller.SalesReport)
     r.POST("/payment", middleware.JWTAuthMiddleware(), controller.DummyPayment)
 

@@ -20,10 +20,29 @@ func Register(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
-    hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+
+    if user.Email == "" || user.Password == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Email and password are required"})
+        return
+    }
+
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Error hashing password"})
+        return
+    }
+
     user.Password = string(hashedPassword)
-    config.DB.Create(&user)
-    c.JSON(http.StatusCreated, gin.H{"message": "User registered"})
+    if user.Role != "admin" && user.Role != "customer" {
+        user.Role = "customer"
+    }
+
+    if err := config.DB.Create(&user).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
+        return
+    }
+
+    c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
 }
 
 func Login(c *gin.Context) {

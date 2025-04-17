@@ -17,6 +17,10 @@ func JWTAuthMiddleware() gin.HandlerFunc {
             return
         }
 
+        if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
+            tokenString = tokenString[7:]
+        }
+
         token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
             return secretKey, nil
         })
