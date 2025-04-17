@@ -32,5 +32,7 @@ func SetupRouter() *gin.Engine {
     r.GET("/report", middleware.JWTAuthMiddleware(), controller.SalesReport)
     r.POST("/payment", middleware.JWTAuthMiddleware(), controller.DummyPayment)
 
+    r.PUT("/orders/:id/confirm", controller.ConfirmOrder)
+
     return r
 }

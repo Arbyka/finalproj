@@ -127,3 +127,31 @@ func UpdateOrderStatus(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Order status updated", "order": order})
 }
+
+func ConfirmOrder(c *gin.Context) {
+    orderIDStr := c.Param("id")
+    orderID, err := strconv.Atoi(orderIDStr)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid order ID"})
+        return
+    }
+
+    var order entity.Order
+    if err := config.DB.First(&order, orderID).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+        return
+    }
+
+    if order.Status != "paid" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Order must be paid before shipping"})
+        return
+    }
+
+    order.Status = "shipped"
+    config.DB.Save(&order)
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Order confirmed and marked for shipment",
+        "order":   order,
+    })
+}
