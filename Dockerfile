@@ -1,5 +1,5 @@
 # Gunakan image Golang resmi
-FROM golang:1.21-alpine
+FROM golang:1.23.4-alpine
 
 # Set direktori kerja dalam container
 WORKDIR /app
