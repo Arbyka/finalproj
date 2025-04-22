@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -13,7 +14,18 @@ import (
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	dsn := "root:Semangat45.@tcp(127.0.0.1:3306)/goproject?charset=utf8mb4&parseTime=True&loc=Local"
+	// Ambil dari environment
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	// Gunakan variabel untuk membentuk DSN
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		dbUser, dbPassword, dbHost, dbPort, dbName,
+	)
+
 	database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Gagal koneksi ke database:", err)
@@ -29,7 +41,7 @@ func ConnectDatabase() {
 		&entity.Order{},
 		&entity.OrderItem{},
 		&entity.Transaction{},
-		&entity.SalesReport{}, // opsional
+		&entity.SalesReport{},
 	)
 
 	if err != nil {

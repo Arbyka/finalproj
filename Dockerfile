@@ -1,17 +1,26 @@
-# Gunakan image Golang resmi
-FROM golang:1.23.4-alpine
+# Stage 1: Build stage
+FROM golang:1.23-alpine AS builder
 
-# Set direktori kerja dalam container
+# Set the working directory
 WORKDIR /app
 
-# Copy semua file ke dalam container
+# Copy the source code
 COPY . .
 
-# Ambil dependency
-RUN go mod tidy
+# Build the Go application
+RUN go build -o service .
 
-# Build binary aplikasi
-RUN go build -o main .
+# Stage 2: final stage
+FROM alpine:latest
 
-# Jalankan aplikasi saat container di-start
-CMD ["./main"]
+# Set the working directory
+WORKDIR /app
+
+# Copy the binary from the build stage
+COPY --from=builder /app/service .
+
+# Set the timezone and install CA certificates
+RUN apk --no-cache add ca-certificates tzdata
+
+# set the entrypoint command
+ENTRYPOINT ["./service"]
