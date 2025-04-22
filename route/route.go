@@ -34,5 +34,7 @@ func SetupRouter() *gin.Engine {
 
     r.PUT("/orders/:id/confirm", controller.ConfirmOrder)
 
+    r.POST("/product-images", controller.CreateProductImage)
+
     return r
 }

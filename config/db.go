@@ -42,6 +42,8 @@ func ConnectDatabase() {
 		&entity.OrderItem{},
 		&entity.Transaction{},
 		&entity.SalesReport{},
+		&entity.ProductImage{},
+
 	)
 
 	if err != nil {
