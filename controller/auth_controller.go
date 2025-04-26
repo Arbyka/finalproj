@@ -51,19 +51,26 @@ func Login(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
+
     var user entity.User
     if err := config.DB.Where("email = ?", loginData.Email).First(&user).Error; err != nil {
         c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
         return
     }
+
     if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password)); err != nil {
         c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
         return
     }
+
+    // ===> Tambahkan role ke dalam token
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "user_id": user.ID,
+        "role":    user.Role,    // <= Tambahkan ini
         "exp":     time.Now().Add(time.Hour * 72).Unix(),
     })
+
     tokenString, _ := token.SignedString(jwtSecret)
+
     c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }

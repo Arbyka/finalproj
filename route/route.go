@@ -18,10 +18,10 @@ func SetupRouter() *gin.Engine {
 
     product := r.Group("/products")
     {
-        product.GET("", controller.GetProducts)
-        product.POST("", middleware.JWTAuthMiddleware(), controller.CreateProduct)
-        product.PUT("/:id", middleware.JWTAuthMiddleware(), controller.UpdateProduct)
-        product.DELETE("/:id", middleware.JWTAuthMiddleware(), controller.DeleteProduct)
+        product.GET("", middleware.JWTAuthMiddleware(), middleware.AdminOnlyMiddleware(), controller.GetProducts)
+        product.POST("", middleware.JWTAuthMiddleware(), middleware.AdminOnlyMiddleware(), controller.CreateProduct)
+        product.PUT("/:id", middleware.JWTAuthMiddleware(), middleware.AdminOnlyMiddleware(), controller.UpdateProduct)
+        product.DELETE("/:id", middleware.JWTAuthMiddleware(), middleware.AdminOnlyMiddleware(), controller.DeleteProduct)
     }
 
     r.POST("/orders", controller.CreateOrder)
@@ -34,7 +34,7 @@ func SetupRouter() *gin.Engine {
 
     r.PUT("/orders/:id/confirm", controller.ConfirmOrder)
 
-    r.POST("/product-images", controller.CreateProductImage)
+    r.POST("/product-images", middleware.JWTAuthMiddleware(), middleware.AdminOnlyMiddleware(), controller.CreateProductImage)
 
     return r
 }
